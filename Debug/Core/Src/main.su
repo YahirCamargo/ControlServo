@@ -1,0 +1,6 @@
+../Core/Src/main.c:37:6:servoEnGrados	24	static
+../Core/Src/main.c:42:6:cicloFor	16	static
+../Core/Src/main.c:58:7:setBothServos	8	static
+../Core/Src/main.c:95:5:main	304	static
+../Core/Src/main.c:211:6:SystemClock_Config	88	static
+../Core/Src/main.c:261:6:Error_Handler	4	static,ignoring_inline_asm
