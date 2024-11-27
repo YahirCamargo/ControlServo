@@ -59,32 +59,32 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
-#define RS_Pin GPIO_PIN_1
-#define RS_GPIO_Port GPIOA
+#define RecibidorUnPeso_Pin GPIO_PIN_0
+#define RecibidorUnPeso_GPIO_Port GPIOC
+#define RecibidorDosPesos_Pin GPIO_PIN_1
+#define RecibidorDosPesos_GPIO_Port GPIOC
+#define RecibidorCincoPesos_Pin GPIO_PIN_2
+#define RecibidorCincoPesos_GPIO_Port GPIOC
+#define RecibidorDiezPesos_Pin GPIO_PIN_3
+#define RecibidorDiezPesos_GPIO_Port GPIOC
+#define MandadorFotoTran_Pin GPIO_PIN_1
+#define MandadorFotoTran_GPIO_Port GPIOA
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
 #define USART_RX_GPIO_Port GPIOA
-#define E_Pin GPIO_PIN_4
-#define E_GPIO_Port GPIOA
+#define RecibidorFotoTran_Pin GPIO_PIN_4
+#define RecibidorFotoTran_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
-#define D7_Pin GPIO_PIN_10
-#define D7_GPIO_Port GPIOB
 #define Trigger_Pin GPIO_PIN_15
 #define Trigger_GPIO_Port GPIOB
-#define D4_Pin GPIO_PIN_10
-#define D4_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
-#define D6_Pin GPIO_PIN_4
-#define D6_GPIO_Port GPIOB
-#define D5_Pin GPIO_PIN_5
-#define D5_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

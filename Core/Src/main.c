@@ -22,11 +22,12 @@
 #include "usart.h"
 #include "gpio.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hc_sr04.h"
-#include "lcd.h"
 #include "math.h"
+#include "rdebug.h"
 #include "stdio.h"
 #include "stdint.h"
 #include "stdlib.h"
@@ -45,11 +46,6 @@
 			if(HCSR04_Get_Distance()<9){
 				detector+=1;
 			}
-			char* str = malloc(sizeof(char)*30);
-			itoa(detector, str,10);
-			Lcd_Set_Cursor(2, 1);
-			Lcd_Send_String(str);
-			free(str);
 			HAL_Delay(40);
 		}
 		return detector;
@@ -58,6 +54,41 @@
 	void setBothServos(TIM_HandleTypeDef servoMotor1,int gradosServoMotor1,TIM_HandleTypeDef servoMotor2,int gradosServoMotor2){
 		servoMotor1.Instance->CCR1=servoEnGrados(gradosServoMotor1);
 		servoMotor2.Instance->CCR1=servoEnGrados(gradosServoMotor2);
+	}
+
+	void concatenar(int pagar, int pagado, char* tipoVehi){
+		char* resultado;
+
+		sprintf(resultado,"%d",pagar);
+		sprintf(resultado, ",");
+		sprintf(resultado,"%d",pagado);
+		sprintf(resultado, ",");
+		sprintf(resultado,tipoVehi);
+
+		rprintf(resultado);
+	}
+
+	int pagar(int pagar){
+		int pagado=0;
+		while(pagar>pagado){
+			if(HAL_GPIO_ReadPin(RecibidorUnPeso_GPIO_Port, RecibidorUnPeso_Pin)==0){
+				pagado+=1;
+				HAL_Delay(100);
+			}
+			if(HAL_GPIO_ReadPin(RecibidorDosPesos_GPIO_Port, RecibidorDosPesos_Pin)==0){
+				pagado+=2;
+				HAL_Delay(100);
+			}
+			if(HAL_GPIO_ReadPin(RecibidorCincoPesos_GPIO_Port, RecibidorCincoPesos_Pin)==0){
+				pagado+=5;
+				HAL_Delay(100);
+			}
+			if(HAL_GPIO_ReadPin(RecibidorDiezPesos_GPIO_Port,RecibidorDiezPesos_Pin)==0){
+				pagado+=5;
+				HAL_Delay(100);
+			}
+		}
+		return pagado;
 	}
 
 /* USER CODE END PTD */
@@ -120,6 +151,7 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
   //HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   /* USER CODE END 2 */
@@ -130,49 +162,57 @@ int main(void)
   MX_TIM1_Init();
   HCSR04_Init();
 
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+
+  //Para el servo de la pluma
+  TIM_HandleTypeDef servoPluma=htim2;
+
   //Para el servo que detecta el vehiculo
   TIM_HandleTypeDef servoMotorDetector=htim2;
   //Para el servo que baja el sensor
   TIM_HandleTypeDef servoMotorBajador=htim3;
-  Lcd_Init();
   int detectarVehiculo;
+  int moto=12;
+  int carro=17;
+  int camion=30;
+
+  int pay;
+  int paid;
+  char* tipoVehiculo;
   while (1)
   {
 	  detectarVehiculo=0;
-	  setBothServos(servoMotorDetector, 10, servoMotorBajador, 60);
-	  Lcd_Clear();
+	  if(HAL_GPIO_ReadPin(RecibidorFotoTran_GPIO_Port, RecibidorFotoTran_Pin)==0){
+		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 60);
 
-	  Lcd_Set_Cursor(1, 1);
-	  Lcd_Send_String("Detectando camion: ");
+		  	  detectarVehiculo=cicloFor(servoMotorDetector,detectarVehiculo);
+		  	  if(detectarVehiculo>3){
+		  		  //Significa que es camion
+		  		  tipoVehiculo="Camion";
+		  		  pay=camion;
+		  		  HAL_Delay(100);
+		  	  }else{
+		  		  detectarVehiculo=0;
+		  		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 0);
+		  		  detectarVehiculo=cicloFor(servoMotorDetector,detectarVehiculo);
 
-	  detectarVehiculo=cicloFor(servoMotorDetector,detectarVehiculo);
-
-	  Lcd_Set_Cursor(1, 1);
-	  if(detectarVehiculo>3){
-		  Lcd_Clear();
-		  Lcd_Send_String("Camion");
-		  //tipoVehiculo='C';
-		  //Significa que es camion
-		  HAL_Delay(5000);
-	  }else{
-		  detectarVehiculo=0;
-		  Lcd_Clear();
-		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 0);
-		  detectarVehiculo=cicloFor(servoMotorDetector,detectarVehiculo);
-		  Lcd_Clear();
-
-		  if(detectarVehiculo>3){
-			  Lcd_Send_String("Automovil");
-			  //tipoVehiculo='A';
-			  HAL_Delay(5000);
-		  }else{
-			  Lcd_Send_String("Moto");
-			  //tipoVehiculo='M';
-			  HAL_Delay(5000);
-		  }
+		  		  if(detectarVehiculo>3){
+		  			  //tipoVehiculo='A';
+		  			  tipoVehiculo="Automovil";
+		  			  pay=carro;
+		  			  HAL_Delay(5000);
+		  		  }else{
+		  			  //tipoVehiculo='M';
+		  			  tipoVehiculo="Motocicleta";
+		  			  pay=moto;
+		  			  HAL_Delay(5000);
+		  		  }
+		  	  }
+		  	  paid=pagar(pay);
 	  }
+
 	  HAL_Delay(50);
 
 
