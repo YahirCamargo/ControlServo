@@ -22,7 +22,6 @@
 #include "usart.h"
 #include "gpio.h"
 
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "hc_sr04.h"
@@ -70,24 +69,22 @@
 		while(pagar>pagado){
 			if(HAL_GPIO_ReadPin(RecibidorUnPeso_GPIO_Port, RecibidorUnPeso_Pin)==0){
 				pagado+=1;
-				concatenar(pagar,pagado,"");
 				HAL_Delay(100);
 			}
 			if(HAL_GPIO_ReadPin(RecibidorDosPesos_GPIO_Port, RecibidorDosPesos_Pin)==0){
 				pagado+=2;
-				concatenar(pagar,pagado,"");
 				HAL_Delay(100);
 			}
 			if(HAL_GPIO_ReadPin(RecibidorCincoPesos_GPIO_Port, RecibidorCincoPesos_Pin)==0){
 				pagado+=5;
-				concatenar(pagar,pagado,"");
 				HAL_Delay(100);
 			}
 			if(HAL_GPIO_ReadPin(RecibidorDiezPesos_GPIO_Port,RecibidorDiezPesos_Pin)==0){
 				pagado+=10;
-				concatenar(pagar,pagado,"");
 				HAL_Delay(100);
 			}
+			concatenar(pagar,pagado,"");
+			HAL_Delay(100);
 		}
 		return pagado;
 	}
@@ -168,7 +165,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
 
   //Para el servo de la pluma
-  TIM_HandleTypeDef servoPluma=htim2;
+  TIM_HandleTypeDef servoPluma=htim1;
 
   //Para el servo que detecta el vehiculo
   TIM_HandleTypeDef servoMotorDetector=htim2;
@@ -185,7 +182,7 @@ int main(void)
   while (1)
   {
 	  detectarVehiculo=0;
-	  if(HAL_GPIO_ReadPin(RecibidorFotoTran_GPIO_Port, RecibidorFotoTran_Pin)==0){
+	  HAL_GPIO_WritePin(Mandador_GPIO_Port, Mandador_Pin, 1);
 		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 60);
 		  	  detectarVehiculo=cicloFor(servoMotorDetector);
 		  	  if(detectarVehiculo>3){
@@ -201,17 +198,18 @@ int main(void)
 		  			  //tipoVehiculo='A';
 		  			  tipoVehiculo="Automovil";
 		  			  pay=carro;
-		  			  HAL_Delay(5000);
+		  			  HAL_Delay(100);
 		  		  }else{
 		  			  //tipoVehiculo='M';
 		  			  tipoVehiculo="Motocicleta";
 		  			  pay=moto;
-		  			  HAL_Delay(5000);
+		  			  HAL_Delay(100);
 		  		  }
 		  	  }
 		  	  paid=pagar(pay);
-		  	  cocatenar(pay,paid,tipoVehiculo)
-	  }
+		  	  concatenar(pay,paid,tipoVehiculo);
+
+
 
 	  HAL_Delay(50);
 

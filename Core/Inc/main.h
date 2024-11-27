@@ -67,14 +67,12 @@ void Error_Handler(void);
 #define RecibidorCincoPesos_GPIO_Port GPIOC
 #define RecibidorDiezPesos_Pin GPIO_PIN_3
 #define RecibidorDiezPesos_GPIO_Port GPIOC
-#define MandadorFotoTran_Pin GPIO_PIN_1
-#define MandadorFotoTran_GPIO_Port GPIOA
+#define Mandador_Pin GPIO_PIN_1
+#define Mandador_GPIO_Port GPIOA
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
 #define USART_RX_GPIO_Port GPIOA
-#define RecibidorFotoTran_Pin GPIO_PIN_4
-#define RecibidorFotoTran_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
 #define Trigger_Pin GPIO_PIN_15
