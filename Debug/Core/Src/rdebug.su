@@ -1,0 +1,5 @@
+../Core/Src/rdebug.c:9:6:Initrdebug	16	static
+../Core/Src/rdebug.c:13:6:transmit	24	static
+../Core/Src/rdebug.c:17:6:rprintf	272	static
+../Core/Src/rdebug.c:27:6:rmsg	16	static
+../Core/Src/rdebug.c:31:6:rdmsg	72	static

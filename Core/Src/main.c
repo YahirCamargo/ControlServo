@@ -36,11 +36,12 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 	int servoEnGrados(int grados){
-		int gradosParaPlaca=(ceil(gradosParaPlaca=(grados*11.111)+500));
+		int gradosParaPlaca=(ceil((grados*11.111)+500));
 		return gradosParaPlaca;
 	}
 
-	int cicloFor(TIM_HandleTypeDef servoMotor,int detector){
+	int cicloFor(TIM_HandleTypeDef servoMotor){
+		int detector=0;
 		for(int i=0;i<51;i++){
 			servoMotor.Instance->CCR1=servoEnGrados(i);
 			if(HCSR04_Get_Distance()<9){
@@ -57,15 +58,11 @@
 	}
 
 	void concatenar(int pagar, int pagado, char* tipoVehi){
-		char* resultado;
+		char resultado[50];
 
-		sprintf(resultado,"%d",pagar);
-		sprintf(resultado, ",");
-		sprintf(resultado,"%d",pagado);
-		sprintf(resultado, ",");
-		sprintf(resultado,tipoVehi);
+		sprintf(resultado, "%d,%d,%s", pagar, pagado, tipoVehi);
 
-		rprintf(resultado);
+		rprintf("%s\n",resultado);
 	}
 
 	int pagar(int pagar){
@@ -73,18 +70,22 @@
 		while(pagar>pagado){
 			if(HAL_GPIO_ReadPin(RecibidorUnPeso_GPIO_Port, RecibidorUnPeso_Pin)==0){
 				pagado+=1;
+				concatenar(pagar,pagado,"");
 				HAL_Delay(100);
 			}
 			if(HAL_GPIO_ReadPin(RecibidorDosPesos_GPIO_Port, RecibidorDosPesos_Pin)==0){
 				pagado+=2;
+				concatenar(pagar,pagado,"");
 				HAL_Delay(100);
 			}
 			if(HAL_GPIO_ReadPin(RecibidorCincoPesos_GPIO_Port, RecibidorCincoPesos_Pin)==0){
 				pagado+=5;
+				concatenar(pagar,pagado,"");
 				HAL_Delay(100);
 			}
 			if(HAL_GPIO_ReadPin(RecibidorDiezPesos_GPIO_Port,RecibidorDiezPesos_Pin)==0){
-				pagado+=5;
+				pagado+=10;
+				concatenar(pagar,pagado,"");
 				HAL_Delay(100);
 			}
 		}
@@ -186,17 +187,15 @@ int main(void)
 	  detectarVehiculo=0;
 	  if(HAL_GPIO_ReadPin(RecibidorFotoTran_GPIO_Port, RecibidorFotoTran_Pin)==0){
 		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 60);
-
-		  	  detectarVehiculo=cicloFor(servoMotorDetector,detectarVehiculo);
+		  	  detectarVehiculo=cicloFor(servoMotorDetector);
 		  	  if(detectarVehiculo>3){
 		  		  //Significa que es camion
 		  		  tipoVehiculo="Camion";
 		  		  pay=camion;
 		  		  HAL_Delay(100);
 		  	  }else{
-		  		  detectarVehiculo=0;
 		  		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 0);
-		  		  detectarVehiculo=cicloFor(servoMotorDetector,detectarVehiculo);
+		  		  detectarVehiculo=cicloFor(servoMotorDetector);
 
 		  		  if(detectarVehiculo>3){
 		  			  //tipoVehiculo='A';
@@ -211,6 +210,7 @@ int main(void)
 		  		  }
 		  	  }
 		  	  paid=pagar(pay);
+		  	  cocatenar(pay,paid,tipoVehiculo)
 	  }
 
 	  HAL_Delay(50);
