@@ -34,7 +34,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 			flag_captured = 0;
 
 			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-			__HAL_TIM_DISABLE_IT(&htim1, TIM_IT_CC1);
+			__HAL_TIM_DISABLE_IT(&htim5, TIM_IT_CC1);
 		}
 	}
 }
@@ -42,15 +42,15 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 void HCSR04_Init(void)
 {
 	HAL_GPIO_WritePin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
-	HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1);
+	HAL_TIM_IC_Start_IT(&htim5, TIM_CHANNEL_1);
 }
 
 uint16_t HCSR04_Get_Distance(void)
 {
 	HAL_GPIO_WritePin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_SET);
-	__HAL_TIM_SetCounter(&htim1, 0);
-	while (__HAL_TIM_GetCounter(&htim1) < 10);
+	__HAL_TIM_SetCounter(&htim5, 0);
+	while (__HAL_TIM_GetCounter(&htim5) < 10);
 	HAL_GPIO_WritePin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
-	__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC1);
+	__HAL_TIM_ENABLE_IT(&htim5, TIM_IT_CC1);
 	return dist;
 }

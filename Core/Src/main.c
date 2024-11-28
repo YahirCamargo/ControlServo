@@ -64,7 +64,8 @@
 		rprintf("%s\n",resultado);
 	}
 
-	int pagar(int pagar){
+	int pagar(int pagar,char* vehic){
+
 		int pagado=0;
 		while(pagar>pagado){
 			if(HAL_GPIO_ReadPin(RecibidorUnPeso_GPIO_Port, RecibidorUnPeso_Pin)==0){
@@ -83,8 +84,8 @@
 				pagado+=10;
 				HAL_Delay(100);
 			}
-			concatenar(pagar,pagado,"");
-			HAL_Delay(100);
+			concatenar(pagar,pagado,vehic);
+			HAL_Delay(10);
 		}
 		return pagado;
 	}
@@ -150,6 +151,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_USART6_UART_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
   //HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   /* USER CODE END 2 */
@@ -171,47 +173,62 @@ int main(void)
   TIM_HandleTypeDef servoMotorDetector=htim2;
   //Para el servo que baja el sensor
   TIM_HandleTypeDef servoMotorBajador=htim3;
-  int detectarVehiculo;
+  int detectarVehiculo=0;
   int moto=12;
   int carro=17;
   int camion=30;
 
   int pay;
   int paid;
+
+  int entrar=0;
   char* tipoVehiculo;
+  Initrdebug(&huart6);
   while (1)
   {
+	  setBothServos(servoMotorDetector, 10, servoMotorBajador, 0);
+	  while(HCSR04_Get_Distance()>5);
+	  HAL_Delay(1000);
+
 	  detectarVehiculo=0;
 	  HAL_GPIO_WritePin(Mandador_GPIO_Port, Mandador_Pin, 1);
-		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 60);
-		  	  detectarVehiculo=cicloFor(servoMotorDetector);
-		  	  if(detectarVehiculo>3){
-		  		  //Significa que es camion
-		  		  tipoVehiculo="Camion";
-		  		  pay=camion;
-		  		  HAL_Delay(100);
-		  	  }else{
-		  		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 0);
-		  		  detectarVehiculo=cicloFor(servoMotorDetector);
+	  setBothServos(servoMotorDetector, 10, servoMotorBajador, 60);
+	  detectarVehiculo=cicloFor(servoMotorDetector);
 
-		  		  if(detectarVehiculo>3){
-		  			  //tipoVehiculo='A';
-		  			  tipoVehiculo="Automovil";
-		  			  pay=carro;
-		  			  HAL_Delay(100);
-		  		  }else{
-		  			  //tipoVehiculo='M';
-		  			  tipoVehiculo="Motocicleta";
-		  			  pay=moto;
-		  			  HAL_Delay(100);
-		  		  }
-		  	  }
-		  	  paid=pagar(pay);
-		  	  concatenar(pay,paid,tipoVehiculo);
+	  if(detectarVehiculo>3){
+		  //Significa que es camion
+		  tipoVehiculo="Camion";
+		  pay=camion;
+		  entrar=1;
+		  HAL_Delay(100);
+	  }else{
+		  setBothServos(servoMotorDetector, 10, servoMotorBajador, 0);
+	  	  detectarVehiculo=cicloFor(servoMotorDetector);
 
-
-
-	  HAL_Delay(50);
+	  	  if(detectarVehiculo>10){
+	  		  //tipoVehiculo='A';
+	  		  tipoVehiculo="Automovil";
+	  		  entrar=1;
+	  		  pay=carro;
+	  		  HAL_Delay(100);
+	  	  }else if(detectarVehiculo>0){
+	  		  //tipoVehiculo='M';
+	  		  tipoVehiculo="Motocicleta";
+	  		  entrar=1;
+	  		  pay=moto;
+	  		  HAL_Delay(100);
+	  	  }
+	  }
+	  if(entrar==1){
+		  paid=pagar(pay,tipoVehiculo);
+		  concatenar(pay,paid,tipoVehiculo);
+		  servoPluma.Instance->CCR1=servoEnGrados(0);
+		  HAL_Delay(10000);
+		  servoPluma.Instance->CCR1=servoEnGrados(90);
+	  }
+	  servoPluma.Instance->CCR1=servoEnGrados(90);
+	  HAL_Delay(500);
+	  entrar=0;
 
 
 
